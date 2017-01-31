@@ -40,11 +40,13 @@ module.exports = class Process {
 
     this.scheduler.enqueue(newChild);
     this.scheduler.run();
+
+    return newChild;
   }
 
-  isBlocked() {
-    return this.status.list.length > 0;
-  }
+//  isBlocked() {
+//    return this.status.list.length > 0;
+//  }
 
   detachProcessFromParent() {
     let parent = this.creationTree.parent;
@@ -73,8 +75,8 @@ module.exports = class Process {
     // remove reference from resources, if in queue
     // what if this process is running and is not in a queue?
     // when parent removed should I remove parent ref from a child?
-
-    this._destroyAllChildren();
+    // need to release resources
+    this.destroyAllChildren();
 
     this.detachProcessFromParent();
     this.detachImmediateChildren();
@@ -84,6 +86,32 @@ module.exports = class Process {
     if ( this.scheduler.runningProcess === this ) {
       this.scheduler.runningProcess = null;
     }
+
+    this.leaveResourcesQueue();
+    this.releaseResources();
+
+  }
+
+  leaveResourcesQueue () {
+    this.status.list.forEach(resource => {
+      _.remove(resource.queue, {id: this.id});
+    });
+
+    this.status.list = [];
+  }
+
+  releaseResources() {
+    this.otherResources.forEach( resource =>{
+
+      let nextUserProcess = resource.getNextProcessInQueue();
+      if ( nextUserProcess ) {
+        this.scheduler.enqueue(nextUserProcess);
+      }
+
+      resource.userProcess = null;
+    });
+
+    this.otherResources = [];
   }
 
   // this function removes parent reference from creationTree.parent of children
@@ -94,7 +122,8 @@ module.exports = class Process {
   }
 
   // private method
-  _destroyAllChildren() {
+  // NOTE: this method  doesn't trigger scheuduler
+  destroyAllChildren() {
     let childCount = this.creationTree.children.length;
     if ( childCount > 0 ) {
       while ( childCount-- ) {
@@ -107,7 +136,9 @@ module.exports = class Process {
   destroyProcessById ( id ) {
     let rootProcess = this.getRoot();
     let processToDestroy = rootProcess.findProcessById(id);
-    processToDestroy._destroy();
+    if ( processToDestroy ) {
+      processToDestroy._destroy();
+    }
     this.scheduler.run();
   }
 
@@ -115,16 +146,22 @@ module.exports = class Process {
     if ( !this.creationTree.parent ) return this;
     return this.creationTree.parent.getRoot();
   }
-
+// init -> x -> z
   findProcessById ( id ) {
     if ( this.id === id ) {
       return this;
     }
+    var process;
+    for ( var i = 0; i < this.creationTree.children.length; i++ ) {
+      if ( process = this.creationTree.children[i].findProcessById(id) ) {
+        return process;
+      }
+    }
 
-    return this.creationTree.children
-      .find( child => {
-        return !!child.findProcessById(id);
-      });
+//    return this.creationTree.children
+//      .find( child => {
+//        return !!child.findProcessById(id);
+//      });
   }
 
 }

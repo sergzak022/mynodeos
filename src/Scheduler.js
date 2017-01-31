@@ -33,7 +33,8 @@ module.exports = class Scheduler {
   // need to check priority and if process is blocked
   getNextProcessToRun() {
     let processToRun = this.queue.reduce(( maxPriorityProcessSoFar, priorityLevel ) => {
-      let maxPriorityProcess = ( priorityLevel || [] ).filter(process => !process.isBlocked())[0];
+      //let maxPriorityProcess = ( priorityLevel || [] ).filter(process => !process.isBlocked())[0];
+      let maxPriorityProcess = ( priorityLevel || [] )[0];
 
       return maxPriorityProcessSoFar.priority > this.getProcessPriorityOrNegInfinity(maxPriorityProcess)
         ? maxPriorityProcessSoFar
@@ -43,6 +44,16 @@ module.exports = class Scheduler {
     return processToRun.priority > -1
       ? processToRun
       : null;
+  }
+
+  removeProcessFromScheduler ( process ) {
+    //if process is currently running then remove it
+    // else remove it from queue
+    if ( this.runningProcess === process ) {
+      this.runningProcess = null;
+    } else {
+      this.removeProcessFromQueue( process );
+    }
   }
 
   removeProcessFromQueue( process ) {
