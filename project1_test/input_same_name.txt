@@ -1,0 +1,10 @@
+cr x 1
+cr x 1
+
+init
+cr y 1
+cr y 2
+
+init
+cr z 2
+cr z 1

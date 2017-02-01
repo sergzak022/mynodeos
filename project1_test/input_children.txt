@@ -1,0 +1,109 @@
+cr parent 1
+cr a 2
+cr b 2
+cr c 2
+cr d 2
+cr e 1
+cr f 1
+cr g 1
+cr h 2
+cr i 2
+cr j 1
+cr k 2
+cr l 2
+cr m 2
+cr n 2
+cr o 1
+cr p 1
+cr q 1
+cr r 2
+cr s 2
+cr t 2
+cr u 2
+cr v 2
+cr w 1
+cr x 1
+cr y 1
+cr z 1
+cr aa 1
+cr bb 1
+cr cc 2
+cr dd 2
+cr ee 2
+cr ff 2
+cr gg 2
+cr hh 1
+cr ii 1
+cr jj 1
+cr kk 1
+cr ll 1
+cr mm 1
+to
+de parent
+to
+
+init
+cr parent 1
+cr a 2
+cr b 2
+to
+cr c 2
+to
+cr d 2
+to
+cr e 1
+cr f 1
+cr g 1
+to
+cr h 2
+cr i 2
+to
+cr j 1
+to
+cr k 2
+cr l 2
+to
+cr m 2
+cr n 2
+cr o 1
+to
+cr p 1
+cr q 1
+to
+cr r 2
+cr s 2
+to
+cr t 2
+cr u 2
+to
+cr v 2
+to
+cr w 1
+cr x 1
+cr y 1
+to
+cr z 1
+cr aa 1
+to
+cr bb 1
+cr cc 2
+to
+cr dd 2
+cr ee 2
+cr ff 2
+to
+cr gg 2
+cr hh 1
+to
+cr ii 1
+cr jj 1
+cr kk 1
+to
+cr ll 1
+cr mm 1
+to
+de parent
+to
+to
+to
+to

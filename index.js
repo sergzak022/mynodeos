@@ -29,12 +29,13 @@ process.stdin.on('readable', ()=>{
   let lines = chunk.toString()
     .split('\n');
 
-  lines.forEach( line =>{
+  lines.forEach( line => {
 
-    if ( !line || !line.length ) return;
+    let trimedLine = line.trim();
 
-    let params = line.toString()
-      .split(' ');
+    if ( !trimedLine || !trimedLine.length ) return;
+
+    let params = trimedLine.split(' ');
 
     let commandName = params[0];
     let args = params.slice(1);
@@ -45,7 +46,7 @@ process.stdin.on('readable', ()=>{
         args
       );
     } else {
-      throw new Error('Invalid command' + params);
+      throw new Error('Invalid command ' + params);
     }
 
   });

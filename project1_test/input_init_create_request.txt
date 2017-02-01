@@ -1,0 +1,19 @@
+cr x 0
+
+init
+cr y 3
+
+init
+req R1 1
+
+init
+req R2 2
+
+init
+req R3 2
+
+init
+cr x 1
+cr y 2
+de x
+req R1 1

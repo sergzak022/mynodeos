@@ -15,15 +15,21 @@ exports.CommandRunner = class CommandRunner {
     );
 
     this.resourceManager = new ResourceManager(
-      this.scheduler
+      this.scheduler,
+      [
+        {id: 'R1', limit: 1},
+        {id: 'R2', limit: 2},
+        {id: 'R3', limit: 3},
+        {id: 'R4', limit: 4}
+      ]
     );
 
     this.scheduler.enqueue(this.runningProcess);
     this.scheduler.run();
   }
 
-  isValidCommandAndArguments ( commanName, args ) {
-    switch ( commanName ) {
+  isValidCommandAndArguments ( commandName, args ) {
+    switch ( commandName ) {
       case 'cr':
         return args.length > 1;
       case 'de':
@@ -41,17 +47,22 @@ exports.CommandRunner = class CommandRunner {
   }
 
   run ( commanName, args ) {
-    this.runCommand(
-      this.scheduler.runningProcess,
-      commanName,
-      args,
-      this.resourceManager
-    );
+    try {
+      this.runCommand(
+        this.scheduler.runningProcess,
+        commanName,
+        args,
+        this.resourceManager
+      );
+    } catch (e) {
+      process.stdout.write('error ');
+    }
   }
 
   runCommand ( runningProcess, name, args, resourceManager ) {
     switch ( name ) {
       case 'init':
+        process.stdout.write('\n');
         let root = runningProcess.getRoot();
 
         root.destroyAllChildren();
@@ -73,13 +84,24 @@ exports.CommandRunner = class CommandRunner {
         break;
       }
       case 'req': {
-        let [resourceId] = args;
-        resourceManager.request(resourceId, runningProcess );
+        let [
+          resourceId,
+          numResourceUnitsNeeded
+        ] = args;
+
+        resourceManager.request(
+          resourceId,
+          runningProcess,
+          +numResourceUnitsNeeded
+        );
         break;
       }
       case 'rel': {
         let [resourceId] = args;
-        resourceManager.release( resourceId );
+        resourceManager.release(
+          resourceId,
+          runningProcess
+        );
         break;
       }
       case 'to':

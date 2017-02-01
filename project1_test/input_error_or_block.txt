@@ -1,0 +1,8 @@
+cr x 1
+req R2 2
+req R2 1
+
+init
+cr x 1
+req R2 1
+req R2 2

@@ -94,24 +94,22 @@ module.exports = class Process {
 
   leaveResourcesQueue () {
     this.status.list.forEach(resource => {
-      _.remove(resource.queue, {id: this.id});
+      resource.removeProcessFromQueue( this.id );
     });
 
     this.status.list = [];
   }
 
   releaseResources() {
-    this.otherResources.forEach( resource =>{
+    _.eachRight( this.otherResources, resource => {
+      resource.removeUserProcess(this.id);
 
-      let nextUserProcess = resource.getNextProcessInQueue();
+      let nextUserProcess = resource.giveResourceToNextProcess();
+
       if ( nextUserProcess ) {
         this.scheduler.enqueue(nextUserProcess);
       }
-
-      resource.userProcess = null;
     });
-
-    this.otherResources = [];
   }
 
   // this function removes parent reference from creationTree.parent of children
@@ -134,10 +132,11 @@ module.exports = class Process {
 
   //only this method should be used to remove a process
   destroyProcessById ( id ) {
-    let rootProcess = this.getRoot();
-    let processToDestroy = rootProcess.findProcessById(id);
+    let processToDestroy = this.findProcessById(id);
     if ( processToDestroy ) {
       processToDestroy._destroy();
+    } else {
+      throw Error(`Can't remove the process because it's not a descendend`);
     }
     this.scheduler.run();
   }

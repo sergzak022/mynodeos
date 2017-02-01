@@ -1,0 +1,3 @@
+init x error
+init y error
+init z error
