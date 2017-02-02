@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { ResourceManager } = require('./Resource');
 const Scheduler = require('./Scheduler');
 const Process = require('./Process');
@@ -31,9 +32,9 @@ exports.CommandRunner = class CommandRunner {
   isValidCommandAndArguments ( commandName, args ) {
     switch ( commandName ) {
       case 'cr':
-        return args.length > 1;
+        return args.length > 1 && _.inRange(+args[1], 1, 3);
       case 'de':
-        return args.length > 0;
+        return args.length > 0 && args[0] !== 'init';
       case 'req':
         return args.length > 0;
       case 'rel':
@@ -48,6 +49,10 @@ exports.CommandRunner = class CommandRunner {
 
   run ( commanName, args ) {
     try {
+      if ( commanName === 'req' && this.scheduler.runningProcess.id === 'init'  ) {
+        throw new Error('init can not request resources');
+      }
+
       this.runCommand(
         this.scheduler.runningProcess,
         commanName,

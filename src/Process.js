@@ -132,6 +132,7 @@ module.exports = class Process {
 
   //only this method should be used to remove a process
   destroyProcessById ( id ) {
+    //this.getRoot();
     let processToDestroy = this.findProcessById(id);
     if ( processToDestroy ) {
       processToDestroy._destroy();

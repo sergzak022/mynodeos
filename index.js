@@ -1,24 +1,6 @@
 const _ = require('lodash');
-//const Process = require('./src/Process');
-//const { Resource } = require('./src/Resource');
-//const Scheduler = require('./src/Scheduler');
-//const { isValidCommandAndArguments, runCommand } = require('./src/util');
 const { CommandRunner } = require('./src/util');
 
-// used to generate a unique process id
-//let processCounter = 0;
-
-//let scheduler = new Scheduler();
-
-// initial parent process
-//let runningProcess = new Process(
-//  'init',
-//  0,
-//  scheduler
-//);
-//
-//scheduler.enqueue(runningProcess);
-//scheduler.run();
 let commandRunner = new CommandRunner();
 
 process.stdin.on('readable', ()=>{
@@ -26,7 +8,8 @@ process.stdin.on('readable', ()=>{
 
   if ( chunk == null ) return;
 
-  let lines = chunk.toString()
+  let lines = chunk
+    .toString()
     .split('\n');
 
   lines.forEach( line => {
