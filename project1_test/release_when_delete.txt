@@ -1,0 +1,8 @@
+cr x 2
+cr y 2
+to
+req R1 1
+to
+req R1 1
+de y
+

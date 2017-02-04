@@ -1,3 +1,4 @@
+#! /usr/local/bin/node
 const _ = require('lodash');
 const { CommandRunner } = require('./src/util');
 
