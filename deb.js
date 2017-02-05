@@ -2,14 +2,14 @@ const { CommandRunner } = require('./src/util');
 
 let commandRunner = new CommandRunner();
 
-let input = `cr x 1
-req R2 2
+let input = `cr x 2
+cr y 2
 req R2 1
-
-init
-cr x 1
+to
 req R2 1
-req R2 2`
+to
+req R2 1
+de y` // x should start running
 
 
 let lines = input

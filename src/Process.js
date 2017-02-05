@@ -89,7 +89,6 @@ module.exports = class Process {
 
     this.leaveResourcesQueue();
     this.releaseResources();
-
   }
 
   leaveResourcesQueue () {
@@ -102,7 +101,7 @@ module.exports = class Process {
 
   releaseResources() {
     _.eachRight( this.otherResources, resource => {
-      resource.removeUserProcess(this.id);
+      resource.removeUserProcessAndReleaseUnitsOfResource(this.id);
 
       let nextUserProcess = resource.giveResourceToNextProcess();
 

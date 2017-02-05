@@ -1,0 +1,12 @@
+cr x 2
+cr y 2
+cr z 2
+to
+req R1 1
+req R2 2
+to
+req R1 1
+req R2 1
+de y
+init
+

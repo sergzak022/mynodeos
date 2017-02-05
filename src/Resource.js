@@ -101,16 +101,29 @@ class Resource {
     );
   }
 
+  // remove user process from resource
+  // and release units of the resource
   removeUserProcess( processId ) {
-    let userProcessInfo = _.head(
+    return _.head(
       _.remove(
         this.userProcesses,
         { process: { id: processId } }
       )
     );
 
+//    if ( userProcessInfo ) {
+//      _.remove(userProcessInfo.process.otherResources, { id: processId });
+//      this.unitsUsed -= userProcessInfo.units;
+//    }
+//
+//    return userProcessInfo;
+  }
+
+  removeUserProcessAndReleaseUnitsOfResource( processId ) {
+    let userProcessInfo = this.removeUserProcess( processId );
+
     if ( userProcessInfo ) {
-      _.remove(userProcessInfo.process.otherResources, { id: processId });
+      _.remove(userProcessInfo.process.otherResources, { id: this.id });
       this.unitsUsed -= userProcessInfo.units;
     }
   }
@@ -127,20 +140,25 @@ class Resource {
     let requesterProcess = this.isUserProcess( requesterProcessId ) && this.getUserProcessInfo( requesterProcessId );
 
     return ( this.unitsLimit < numUnitsRequested )
-      || ( this.userProcesses.length === 1 && !!requesterProcess
-           && ( requesterProcess.units + numUnitsRequested )  > this.unitsLimit );
+      || ( !!requesterProcess && ( ( requesterProcess.units + numUnitsRequested )  > this.unitsLimit ) );
   }
 
   // need to handle a case when processToSetAsUser is already a user
   request( processToSetAsUser, numUnitsNeeded ) {
-    debugger;
     if ( this.getIsNotEnoughUnitsOfResource( processToSetAsUser.id, numUnitsNeeded ) ) {
       throw new Error(`do not have enough units of resource ${this.id}. Available: ${this.unitsLimit - this.unitsUsed}, Requested: ${numUnitsNeeded}`);
     }
 
     if ( this.unitsLimit >= ( this.unitsUsed + numUnitsNeeded ) ) {
       this.setAsUserProcess(processToSetAsUser, numUnitsNeeded);
-    } else {
+    } else if ( this.isUserProcess(processToSetAsUser.id) ) {
+      //need to remove process from user list, so resource manager can remove it from run queue
+      this.removeUserProcess(processToSetAsUser.id);
+      this.enqueProcessIntoWaitList(
+        processToSetAsUser,
+        numUnitsNeeded
+      );
+    } else { // not enough resources and process is not currently a user process of resource
       this.enqueProcessIntoWaitList(
         processToSetAsUser,
         numUnitsNeeded
@@ -148,14 +166,14 @@ class Resource {
     }
   }
 
-    enqueProcessIntoWaitList( process, units ) {
-      this.queue.push({
-        units,
-        process
-      });
+  enqueProcessIntoWaitList( process, units ) {
+    this.queue.push({
+      units,
+      process
+    });
 
-      process.status.list.push(this);
-    }
+    process.status.list.push(this);
+  }
   //init can't request resource
   release( releaseProcess ) {
 
@@ -165,8 +183,8 @@ class Resource {
 
     if ( this.isUserProcess( releaseProcess.id ) ) {
 
-      this.removeUserProcess( releaseProcess.id );
-      _.remove(releaseProcess.otherResources, { id: this.id });
+      this.removeUserProcessAndReleaseUnitsOfResource( releaseProcess.id );
+      //_.remove(releaseProcess.otherResources, { id: this.id });
 
     } else if ( this.isProcessInWaitQueue( releaseProcess.id ) ) {
       this.removeProcessFromQueue(releaseProcess.id);
